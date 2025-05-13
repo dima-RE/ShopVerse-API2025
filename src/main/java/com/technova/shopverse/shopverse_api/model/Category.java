@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // Para generar el ID, no debe estar definido dentro del constructor.
     private String name;
     private String description;
 

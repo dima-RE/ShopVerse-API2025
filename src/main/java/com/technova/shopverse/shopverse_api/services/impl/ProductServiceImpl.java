@@ -58,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
             saveProd(prod);
             return new ResponseEntity<>("Se actualizo el producto", HttpStatus.OK);
         }
-        return new ResponseEntity<>("No se encontro el producto", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("No se encontró el producto", HttpStatus.NOT_FOUND);
     }
 
     @Override
@@ -70,13 +70,13 @@ public class ProductServiceImpl implements ProductService {
         if (dto == null) {
             throw new InvalidDataFromProductException("El producto no puede estar vacio.");
         }
-        if (dto.getName().isBlank() || dto.getName() == null) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
             throw new InvalidDataFromProductException("El nombre no puede estar vacio.");
         }
-        if (dto.getDescription().isBlank() || dto.getDescription() == null) {
+        if (dto.getDescription() == null || dto.getDescription().isBlank()) {
             throw new InvalidDataFromProductException("La descripcion no puede estar vacia.");
         }
-        if (dto.getPrice() <= 0 || dto.getPrice() == null) {
+        if (dto.getPrice() == null || dto.getPrice() <= 0) {
             throw new InvalidDataFromProductException("El precio debe ser mayor a 0.");
         }
     }

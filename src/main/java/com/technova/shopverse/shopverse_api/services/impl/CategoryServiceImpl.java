@@ -2,18 +2,17 @@ package com.technova.shopverse.shopverse_api.services.impl;
 
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromCategoryException;
-import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromProductException;
-import com.technova.shopverse.shopverse_api.exceptions.ProductNotFoundException;
 import com.technova.shopverse.shopverse_api.model.Category;
-import com.technova.shopverse.shopverse_api.model.Product;
 import com.technova.shopverse.shopverse_api.repositories.CategoryRepository;
 import com.technova.shopverse.shopverse_api.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
@@ -27,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getCatById(Long id) throws CategoryNotFoundException {
         return catRepo.findById(id).orElseThrow(
-                () -> new CategoryNotFoundException("Categoria no encontrada con el id." + id));
+                () -> new CategoryNotFoundException("Categoria no encontrada con el id: " + id));
     }
 
     @Override
@@ -70,11 +69,11 @@ public class CategoryServiceImpl implements CategoryService {
         if (dto == null) {
             throw new InvalidDataFromCategoryException("La categoria no puede estar vacia.");
         }
-        if (dto.getName().isBlank() || dto.getName() == null) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
             throw new InvalidDataFromCategoryException("El nombre no puede estar vacio.");
         }
-        if (dto.getDescription().isBlank() || dto.getDescription() == null) {
-            throw new InvalidDataFromCategoryException("La descripcion no puede estar vacia.");
+        if (dto.getDescription() == null || dto.getDescription().isBlank() || dto.getDescription().length() < 10) {
+            throw new InvalidDataFromCategoryException("La descripcion debe tener al menos 10 caracteres.");
         }
     }
 
