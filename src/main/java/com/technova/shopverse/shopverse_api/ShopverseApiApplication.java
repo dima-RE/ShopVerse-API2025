@@ -17,7 +17,7 @@ public class ShopverseApiApplication {
 	@Bean
 	public CommandLineRunner initData(ProductRepository prodr, CategoryRepository catr) {
 		return args -> {
-			System.out.println("== Se comienza sin datos para realizar pruebas HTTPCODE ==");
+			System.out.println("=== Se comienza sin datos para realizar pruebas HTTPCODE ===");
 			// ===== CARGA INICIAL =====
 			/*prodr.save(new Product("Laptop Lenovo", "Notebook 15 pulgadas", 850.0));
 			prodr.save(new Product("Mouse Logitech", "Mouse inalámbrico", 25.5));
