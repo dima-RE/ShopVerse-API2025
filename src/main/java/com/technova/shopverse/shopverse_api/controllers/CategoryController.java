@@ -18,19 +18,19 @@ public class CategoryController {
     private CategoryService catServ;
 
     @GetMapping
-    public List<Category> getAllCategories() {
+    public ResponseEntity<List<Category>> getAllCategories() {
         return catServ.listAllCats();
     }
 
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id) throws CategoryNotFoundException {
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) throws CategoryNotFoundException {
         return catServ.getCatById(id);
     }
 
     @PostMapping
-    public String createCategory(@RequestBody Category category) throws InvalidDataFromCategoryException {
-        catServ.registerCat(category);
-        return "Creado";
+    public ResponseEntity<String> createCategory(@RequestBody Category category)
+            throws InvalidDataFromCategoryException {
+        return catServ.registerCat(category);
     }
 
     // se puede usar el <?> para indicar que el tipo puede variar
@@ -41,8 +41,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Long id) throws CategoryNotFoundException {
-        catServ.deleteCat(id);
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) throws CategoryNotFoundException {
+        return catServ.deleteCat(id);
     }
 
 }

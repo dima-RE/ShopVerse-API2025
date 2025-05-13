@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -19,19 +20,24 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository catRepo;
 
     @Override
-    public List<Category> listAllCats() {
-        return catRepo.findAll();
+    public ResponseEntity<List<Category>> listAllCats() {
+        return Optional.of(catRepo.findAll())
+                .filter(categories -> !categories.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                        // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
+                );
     }
 
     @Override
-    public Category getCatById(Long id) throws CategoryNotFoundException {
-        return catRepo.findById(id).orElseThrow(
+    public ResponseEntity<Category> getCatById(Long id) throws CategoryNotFoundException {
+        return catRepo.findById(id).map(ResponseEntity::ok).orElseThrow(
                 () -> new CategoryNotFoundException("Categoria no encontrada con el id: " + id));
     }
 
     @Override
     public Category createCat(Category dto) {
-        return new Category(dto.getName(), dto.getDescription());
+                return new Category(dto.getName(), dto.getDescription());
     }
 
     @Override
@@ -40,15 +46,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void registerCat(Category cat) throws InvalidDataFromCategoryException {
+    public ResponseEntity<String> registerCat(Category cat) throws InvalidDataFromCategoryException {
         validateData(cat);
         saveCat(createCat(cat));
+        // ¿Existiran casos de borde que puedan saltar el error de Save?
+        return new ResponseEntity<>("Se creo la categoria.", HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<String> updateCat(Long id, Category updCat)
             throws InvalidDataFromCategoryException, CategoryNotFoundException {
-        Category cat = getCatById(id);
+        Category cat = getCatById(id).getBody();
 
         if (cat != null) {
             validateData(updCat);
@@ -61,8 +69,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCat(Long id) throws CategoryNotFoundException {
-        catRepo.deleteById(id);
+    public ResponseEntity<Void> deleteCat(Long id) throws CategoryNotFoundException {
+        Category cat = getCatById(id).getBody();
+
+        if (cat != null) {
+            catRepo.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     public void validateData(Category dto) throws InvalidDataFromCategoryException {

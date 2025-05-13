@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -19,14 +20,20 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository prodRepo;
 
     @Override
-    public List<Product> listAllProds() {
-        return prodRepo.findAll();
+    public ResponseEntity<List<Product>> listAllProds() {
+        // Optional.ofNullable() para evitar un NullPointerException.
+        return Optional.of(prodRepo.findAll())
+                .filter(products -> !products.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
+                );
     }
 
     @Override
-    public Product getProdById(Long id) throws ProductNotFoundException {
-        return prodRepo.findById(id).orElseThrow(
-                () -> new ProductNotFoundException("Producto no encontrado con el id." + id));
+    public ResponseEntity<Product> getProdById(Long id) throws ProductNotFoundException {
+        return prodRepo.findById(id).map(ResponseEntity::ok).orElseThrow(
+                () -> new ProductNotFoundException("Producto no encontrado con el ID: " + id));
     }
 
     @Override
@@ -35,20 +42,20 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void saveProd(Product prod) {
-        prodRepo.save(prod);
-    }
+    public void saveProd(Product prod) { prodRepo.save(prod); }
 
     @Override
-    public void registerProd(Product prod) throws InvalidDataFromProductException {
+    public ResponseEntity<String> registerProd(Product prod) throws InvalidDataFromProductException {
         validateData(prod);
         saveProd(createProd(prod));
+        // ¿Existiran casos de borde que puedan saltar el error de Save?
+        return new ResponseEntity<>("Se creo el producto.", HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<String> updateProd(Long id, Product updProd)
             throws InvalidDataFromProductException, ProductNotFoundException {
-        Product prod = getProdById(id);
+        Product prod = getProdById(id).getBody();
 
         if (prod != null) {
             validateData(updProd);
@@ -56,14 +63,20 @@ public class ProductServiceImpl implements ProductService {
             prod.setDescription(updProd.getDescription());
             prod.setPrice(updProd.getPrice());
             saveProd(prod);
-            return new ResponseEntity<>("Se actualizo el producto", HttpStatus.OK);
+            return new ResponseEntity<>("Se actualizo el producto.", HttpStatus.OK);
         }
-        return new ResponseEntity<>("No se encontró el producto", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("No se encontró el producto.", HttpStatus.NOT_FOUND);
     }
 
     @Override
-    public void deleteProd(Long id) throws ProductNotFoundException {
-        prodRepo.deleteById(id);
+    public ResponseEntity<Void> deleteProd(Long id) throws ProductNotFoundException {
+        Product prod = getProdById(id).getBody();
+
+        if (prod != null) {
+            prodRepo.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     public void validateData(Product dto) throws InvalidDataFromProductException {

@@ -18,19 +18,18 @@ public class ProductController {
     private ProductService prodServ;
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public ResponseEntity<List<Product>> getAllProducts() {
         return prodServ.listAllProds();
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) throws ProductNotFoundException {
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) throws ProductNotFoundException {
         return prodServ.getProdById(id);
     }
 
     @PostMapping
-    public String createProduct(@RequestBody Product product) throws InvalidDataFromProductException {
-        prodServ.registerProd(product);
-        return "Creado";
+    public ResponseEntity<String> createProduct(@RequestBody Product product) throws InvalidDataFromProductException {
+        return prodServ.registerProd(product);
     }
 
     @PutMapping("/{id}")
@@ -40,8 +39,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) throws ProductNotFoundException {
-        prodServ.deleteProd(id);
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) throws ProductNotFoundException {
+        return prodServ.deleteProd(id);
     }
 
 

@@ -8,11 +8,11 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface CategoryService {
-    List<Category> listAllCats();
-    Category getCatById(Long id) throws CategoryNotFoundException;
+    ResponseEntity<List<Category>> listAllCats();
+    ResponseEntity<Category> getCatById(Long id) throws CategoryNotFoundException;
     Category createCat(Category cat);
     void saveCat(Category cat);
-    void registerCat(Category cat) throws InvalidDataFromCategoryException;
+    ResponseEntity<String> registerCat(Category cat) throws InvalidDataFromCategoryException;
     ResponseEntity<String> updateCat(Long id, Category cat) throws CategoryNotFoundException, InvalidDataFromCategoryException;
-    void deleteCat(Long id) throws CategoryNotFoundException;
+    ResponseEntity<Void> deleteCat(Long id) throws CategoryNotFoundException;
 }
