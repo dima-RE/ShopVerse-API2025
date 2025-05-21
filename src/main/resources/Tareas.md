@@ -8,10 +8,6 @@ Aquí te dejo una tabla con otras entidades comunes que podrías encontrar en un
     * Descripción
         * Campos comunes
 
-* Customer
-    * Usuario registrado que compra productos
-        * id, name, email, password, address
-
 * Order
     * Pedido realizado por un cliente
         * id, orderDate, total, customerId

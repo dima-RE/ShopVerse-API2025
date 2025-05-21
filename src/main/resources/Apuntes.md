@@ -106,11 +106,11 @@ Internamente, son atajos de @RequestMapping(method = ...), pero más expresivos.
 ```java
 @GetMapping("/products")
 
-public List<Product> getAllProducts() { ... }
+public List<Product> getAllProducts() { }
 
 @PostMapping("/products")
 
-public Product createProduct(@RequestBody Product product) { ... }
+public Product createProduct(@RequestBody Product product) { }
 ```
 
 ## @RequestParam
@@ -549,3 +549,62 @@ Separa los métodos por tipo de operación (GET, POST, etc.)
 
 
 Centraliza la ruta base con @RequestMapping("/api/entidad") en la clase
+
+## Tipos de relaciones más comunes
+* Relación
+   * ¿Qué significa?
+      * Ejemplo
+
+* @OneToOne
+  * Un objeto está relacionado con uno y solo un objeto.
+      * Un usuario y su perfil.
+
+* @OneToMany
+  * Un objeto tiene muchos relacionados.
+    * Una categoría tiene muchos productos.
+
+* @ManyToOne
+  * Muchos objetos pertenecen a uno solo.
+    * Muchos productos pertenecen a una categoría.
+
+* @ManyToMany
+  * Muchos objetos están relacionados con muchos.
+    * Un producto puede tener muchas etiquetas.
+
+## 📎 Lectura recomendada
+[📘 Spring Boot – JPA Relationships Guide (Baeldung)](https://www.baeldung.com/jpa-join-types)
+
+[📘 What is a DTO? – Martin Fowler](https://martinfowler.com/eaaCatalog/dataTransferObject.html)
+
+[📘 Spring Boot – DTOs and MapStruct](https://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application)
+
+# . Resolviendo errores comunes en JPA
+1.2. Opción 2 – Usar anotaciones de Json
+Si necesitas devolver entidades directamente (por ejemplo, en proyectos rápidos o internos), podés usar:
+
+// En Product.java
+@ManyToOne
+@JsonBackReference
+private Category category;
+
+// En Category.java
+@OneToMany(mappedBy = "category")
+@JsonManagedReference
+private List<Product> products;
+
+O podés evitar la serialización del campo con:
+
+// En Category.java
+@JsonIgnore
+private List<Product> products;
+
+Esto le indica a Json:
+
+* @JsonManagedReference: esta parte se serializa.
+
+* @JsonBackReference: esta parte no se serializa, para evitar el bucle.
+
+* @JsonIgnore: Esto funciona, pero pierdes completamente esa relación en la respuesta. Úsalo solo si sabés que no necesitás mostrar ese campo.
+
+Útil si quieres mantener relaciones pero solo mostrar una dirección.
+

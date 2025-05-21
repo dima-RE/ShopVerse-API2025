@@ -1,9 +1,8 @@
 package com.technova.shopverse.shopverse_api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Category {
@@ -12,6 +11,8 @@ public class Category {
     private Long id; // Para generar el ID, no debe estar definido dentro del constructor.
     private String name;
     private String description;
+    @OneToMany(mappedBy = "category")
+    private List<Product> products;
 
     public Category() {}
 
@@ -44,5 +45,13 @@ public class Category {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProduct(Product product) {
+        this.products.add(product);
     }
 }

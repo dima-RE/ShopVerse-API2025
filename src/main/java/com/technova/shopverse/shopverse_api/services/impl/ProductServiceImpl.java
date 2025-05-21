@@ -1,8 +1,13 @@
 package com.technova.shopverse.shopverse_api.services.impl;
 
+import com.technova.shopverse.shopverse_api.dtos.ProductDTO;
+import com.technova.shopverse.shopverse_api.dtos.ProductModifyDTO;
+import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromProductException;
 import com.technova.shopverse.shopverse_api.exceptions.ProductNotFoundException;
+import com.technova.shopverse.shopverse_api.model.Category;
 import com.technova.shopverse.shopverse_api.model.Product;
+import com.technova.shopverse.shopverse_api.repositories.CategoryRepository;
 import com.technova.shopverse.shopverse_api.repositories.ProductRepository;
 import com.technova.shopverse.shopverse_api.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +24,10 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductRepository prodRepo;
 
-    @Override
+    @Autowired
+    private CategoryRepository catRepo;
+
+    /*@Override
     public ResponseEntity<List<Product>> listAllProds() {
         // Optional.ofNullable() para evitar un NullPointerException.
         return Optional.of(prodRepo.findAll())
@@ -28,24 +36,56 @@ public class ProductServiceImpl implements ProductService {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
                 );
+    }*/
+
+    @Override
+    public ResponseEntity<List<ProductDTO>> listAllProdDTOs() {
+        // Optional.ofNullable() para evitar un NullPointerException.
+        return Optional.of(
+                        prodRepo.findAll().stream().map(this::toDTO).toList()
+                )
+                .filter(products -> !products.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                        // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
+                );
     }
 
     @Override
+    public ResponseEntity<List<ProductDTO>> getByCategoryId(Long categoryId) {
+        return Optional.of(
+                        prodRepo.findByCategoryId(categoryId).stream().map(this::toDTO).toList()
+                )
+                .filter(products -> !products.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                        // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
+                );
+    }
+
+    //@Override
     public ResponseEntity<Product> getProdById(Long id) throws ProductNotFoundException {
         return prodRepo.findById(id).map(ResponseEntity::ok).orElseThrow(
                 () -> new ProductNotFoundException("Producto no encontrado con el ID: " + id));
     }
 
     @Override
-    public Product createProd(Product dto) {
-        return new Product(dto.getName(), dto.getDescription(), dto.getPrice());
+    public ResponseEntity<ProductDTO> getProdDTOById(Long id) throws ProductNotFoundException {
+        return prodRepo.findById(id).map(this::toDTO).map(ResponseEntity::ok).orElseThrow(
+                () -> new ProductNotFoundException("Producto no encontrado con el ID: " + id));
     }
 
-    @Override
+    //@Override
+    public Product createProd(ProductModifyDTO dto) throws CategoryNotFoundException {
+        return new Product(dto.getName(), dto.getDescription(), dto.getPrice(),
+                validateCategory(dto.getCategoryDTO().getId()));
+    }
+
+    //@Override
     public void saveProd(Product prod) { prodRepo.save(prod); }
 
     @Override
-    public ResponseEntity<String> registerProd(Product prod) throws InvalidDataFromProductException {
+    public ResponseEntity<String> registerProd(ProductModifyDTO prod) throws InvalidDataFromProductException, CategoryNotFoundException {
         validateData(prod);
         saveProd(createProd(prod));
         // ¿Existiran casos de borde que puedan saltar el error de Save?
@@ -53,8 +93,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<String> updateProd(Long id, Product updProd)
-            throws InvalidDataFromProductException, ProductNotFoundException {
+    public ResponseEntity<String> updateProd(Long id, ProductModifyDTO updProd)
+            throws InvalidDataFromProductException, ProductNotFoundException, CategoryNotFoundException {
         Product prod = getProdById(id).getBody();
 
         if (prod != null) {
@@ -62,6 +102,7 @@ public class ProductServiceImpl implements ProductService {
             prod.setName(updProd.getName());
             prod.setDescription(updProd.getDescription());
             prod.setPrice(updProd.getPrice());
+            prod.setCategory(validateCategory(updProd.getCategoryDTO().getId()));
             saveProd(prod);
             return new ResponseEntity<>("Se actualizo el producto.", HttpStatus.OK);
         }
@@ -79,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public void validateData(Product dto) throws InvalidDataFromProductException {
+    public void validateData(ProductModifyDTO dto) throws InvalidDataFromProductException {
         if (dto == null) {
             throw new InvalidDataFromProductException("El producto no puede estar vacio.");
         }
@@ -92,6 +133,22 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getPrice() == null || dto.getPrice() <= 0) {
             throw new InvalidDataFromProductException("El precio debe ser mayor a 0.");
         }
+        if (dto.getCategoryDTO().getId() == null || dto.getCategoryDTO().getId() <= 0) {
+            throw new InvalidDataFromProductException("El ID de la categoria no puede venir vacio.");
+        }
+    }
+
+    public Category validateCategory(Long catId) throws CategoryNotFoundException {
+        return catRepo.findById(catId).orElseThrow(
+                () -> new CategoryNotFoundException("Categoria no encontrada con el id " + catId));
+    }
+
+    public ProductDTO toDTO(Product prod) {
+        String catName = prod.getCategory() != null
+                ? prod.getCategory().getName() : null;
+        return new ProductDTO(prod.getId(),
+                prod.getName(), prod.getDescription(),
+                prod.getPrice(), catName);
     }
 
 }

@@ -1,9 +1,6 @@
 package com.technova.shopverse.shopverse_api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Product {
@@ -13,6 +10,9 @@ public class Product {
     private String name;
     private String description;
     private Double price;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
     /*ElementCollection se usa en cosas simples, como Numeros de Telefonos
     La restriccion es que la Tabla Generada no se puede modificar, por lo
     que se debe cambiar completamente.
@@ -23,10 +23,11 @@ public class Product {
 
     public Product() {}
 
-    public Product(String name, String description, Double price) {
+    public Product(String name, String description, Double price, Category category) {
         this.name = name;
         this.description = description;
         this.price = price;
+        this.category = category;
     }
 
     // Getters y Setters
@@ -63,6 +64,14 @@ public class Product {
         this.price = price;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -70,6 +79,7 @@ public class Product {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
+                ", category=" + category +
                 '}';
     }
 }

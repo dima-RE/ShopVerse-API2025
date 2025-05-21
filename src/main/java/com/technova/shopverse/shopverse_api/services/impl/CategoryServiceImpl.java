@@ -1,8 +1,10 @@
 package com.technova.shopverse.shopverse_api.services.impl;
 
+import com.technova.shopverse.shopverse_api.dtos.CategoryDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromCategoryException;
 import com.technova.shopverse.shopverse_api.model.Category;
+import com.technova.shopverse.shopverse_api.model.Product;
 import com.technova.shopverse.shopverse_api.repositories.CategoryRepository;
 import com.technova.shopverse.shopverse_api.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository catRepo;
 
-    @Override
+    /*@Override
     public ResponseEntity<List<Category>> listAllCats() {
         return Optional.of(catRepo.findAll())
                 .filter(categories -> !categories.isEmpty())
@@ -27,26 +29,44 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
                         // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
                 );
-    }
+    }*/
 
     @Override
+    public ResponseEntity<List<CategoryDTO>> listAllCatDTOs() {
+        return Optional.of(
+                    catRepo.findAll().stream().map(this::toDTO).toList()
+                )
+                .filter(categories -> !categories.isEmpty())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+                        // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
+                );
+    }
+
+    //@Override
     public ResponseEntity<Category> getCatById(Long id) throws CategoryNotFoundException {
         return catRepo.findById(id).map(ResponseEntity::ok).orElseThrow(
                 () -> new CategoryNotFoundException("Categoria no encontrada con el id: " + id));
     }
 
     @Override
-    public Category createCat(Category dto) {
-                return new Category(dto.getName(), dto.getDescription());
+    public ResponseEntity<CategoryDTO> getCatDTOById(Long id) throws CategoryNotFoundException {
+       return catRepo.findById(id).map(this::toDTO).map(ResponseEntity::ok).orElseThrow(
+                () -> new CategoryNotFoundException("Categoria no encontrada con el id: " + id));
     }
 
-    @Override
+    //@Override
+    public Category createCat(CategoryDTO dto) {
+        return new Category(dto.getName(), dto.getDescription());
+    }
+
+    //@Override
     public void saveCat(Category cat) {
         catRepo.save(cat);
     }
 
     @Override
-    public ResponseEntity<String> registerCat(Category cat) throws InvalidDataFromCategoryException {
+    public ResponseEntity<String> registerCat(CategoryDTO cat) throws InvalidDataFromCategoryException {
         validateData(cat);
         saveCat(createCat(cat));
         // ¿Existiran casos de borde que puedan saltar el error de Save?
@@ -54,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<String> updateCat(Long id, Category updCat)
+    public ResponseEntity<String> updateCat(Long id, CategoryDTO updCat)
             throws InvalidDataFromCategoryException, CategoryNotFoundException {
         Category cat = getCatById(id).getBody();
 
@@ -72,14 +92,17 @@ public class CategoryServiceImpl implements CategoryService {
     public ResponseEntity<Void> deleteCat(Long id) throws CategoryNotFoundException {
         Category cat = getCatById(id).getBody();
 
-        if (cat != null) {
+        if (cat != null && cat.getProducts().isEmpty()) {
             catRepo.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        if (cat != null && !cat.getProducts().isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public void validateData(Category dto) throws InvalidDataFromCategoryException {
+    public void validateData(CategoryDTO dto) throws InvalidDataFromCategoryException {
         if (dto == null) {
             throw new InvalidDataFromCategoryException("La categoria no puede estar vacia.");
         }
@@ -89,6 +112,13 @@ public class CategoryServiceImpl implements CategoryService {
         if (dto.getDescription() == null || dto.getDescription().isBlank() || dto.getDescription().length() < 10) {
             throw new InvalidDataFromCategoryException("La descripcion debe tener al menos 10 caracteres.");
         }
+    }
+
+    public CategoryDTO toDTO(Category cat) {
+        List<String> productNames = cat.getProducts().stream()
+                .map(Product::getName).toList();
+        return new CategoryDTO(cat.getId(), cat.getName(),
+                cat.getDescription(), productNames);
     }
 
 }
