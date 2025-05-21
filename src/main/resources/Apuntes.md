@@ -608,3 +608,15 @@ Esto le indica a Json:
 
 Útil si quieres mantener relaciones pero solo mostrar una dirección.
 
+# Validaciones
+
+## Validación automática con Bean Validation
+Spring Boot integra Bean Validation (JSR 380), lo que permite aplicar anotaciones directamente en tus modelos para validar los campos.
+
+🔧 Ejemplos de anotaciones útiles:
+
+* @NotNull = Que el valor no sea null
+* @NotBlank = Que el string no esté vacío (ni espacios)
+* @Min(1) = Que el número sea igual o mayor al mínimo
+* @Size(min=5) = Que la cadena tenga al menos una cierta longitud
+* @Email  = Que el string sea un email válido

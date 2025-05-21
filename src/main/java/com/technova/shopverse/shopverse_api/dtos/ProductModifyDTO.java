@@ -4,13 +4,13 @@ public class ProductModifyDTO {
     private String name;
     private String description;
     private Double price;
-    private CategoryDTO categoryDTO;
+    private CategoryDTO category;
 
-    public ProductModifyDTO(String name, String description, Double price, CategoryDTO categoryDTO) {
+    public ProductModifyDTO(String name, String description, Double price, CategoryDTO category) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.categoryDTO = categoryDTO;
+        this.category = category;
     }
 
     public String getName() {
@@ -38,10 +38,11 @@ public class ProductModifyDTO {
     }
 
     public CategoryDTO getCategoryDTO() {
-        return categoryDTO;
+        return category;
     }
 
-    public void setCategoryDTO(CategoryDTO categoryDTO) {
-        this.categoryDTO = categoryDTO;
+    public void setCategoryDTO(CategoryDTO category) {
+        this.category = category;
+
     }
 }

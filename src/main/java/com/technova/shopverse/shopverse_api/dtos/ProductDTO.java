@@ -69,14 +69,4 @@ public class ProductDTO {
         this.categoryName = categoryName;
     }
 
-    @Override
-    public String toString() {
-        return "ProductDTO{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", price=" + price +
-                ", categoryName='" + categoryName + '\'' +
-                '}';
-    }
 }
