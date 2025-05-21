@@ -18,11 +18,6 @@ public class CategoryController {
     @Autowired
     private CategoryService catServ;
 
-    /*@GetMapping
-    public ResponseEntity<List<Category>> getAllCategories() {
-        return catServ.listAllCats();
-    }*/
-
     @GetMapping
     public ResponseEntity<List<CategoryDTO>> getAllCategories() {
         return catServ.listAllCatDTOs();
@@ -39,21 +34,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createCategory(@RequestBody CategoryDTO category)
+    public ResponseEntity<String> createCategory(@Valid @RequestBody CategoryDTO category)
             throws InvalidDataFromCategoryException {
         return catServ.registerCat(category);
     }
 
-    // Use directamente un DTO, no funciona con los @Valid
-    /*@PostMapping
-    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category)
-            throws InvalidDataFromCategoryException {
-        return catServ.registerCat(category);
-    }*/
-
     // se puede usar el <?> para indicar que el tipo puede variar
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCategory(@PathVariable Long id, @RequestBody CategoryDTO updCat)
+    public ResponseEntity<String> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDTO updCat)
             throws InvalidDataFromCategoryException, CategoryNotFoundException {
         return catServ.updateCat(id,updCat);
     }

@@ -1,9 +1,8 @@
 package com.technova.shopverse.shopverse_api.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 @Entity
 public class Product {
@@ -11,9 +10,11 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "El nombre no puede ser nulo")
     @NotBlank(message = "El nombre del producto no puede estar vacío")
     private String name;
 
+    @NotNull(message = "La descripción no debe ser nulo")
     @NotBlank(message = "La descripción no puede estar vacía")
     private String description;
 
@@ -21,9 +22,10 @@ public class Product {
     @Min(value = 1, message = "El precio debe ser mayor a 0")
     private Double price;
 
-    @NotNull(message = "La categoría es obligatoria")
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @NotNull(message = "La categoría es obligatoria")
+    @JsonBackReference
     private Category category;
     /*ElementCollection se usa en cosas simples, como Numeros de Telefonos
     La restriccion es que la Tabla Generada no se puede modificar, por lo

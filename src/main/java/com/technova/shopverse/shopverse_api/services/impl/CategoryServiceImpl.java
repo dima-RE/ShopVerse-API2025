@@ -2,7 +2,6 @@ package com.technova.shopverse.shopverse_api.services.impl;
 
 import com.technova.shopverse.shopverse_api.dtos.CategoryDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
-import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromCategoryException;
 import com.technova.shopverse.shopverse_api.model.Category;
 import com.technova.shopverse.shopverse_api.model.Product;
 import com.technova.shopverse.shopverse_api.repositories.CategoryRepository;
@@ -20,16 +19,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryRepository catRepo;
-
-    /*@Override
-    public ResponseEntity<List<Category>> listAllCats() {
-        return Optional.of(catRepo.findAll())
-                .filter(categories -> !categories.isEmpty())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                        // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
-                );
-    }*/
 
     @Override
     public ResponseEntity<List<CategoryDTO>> listAllCatDTOs() {
@@ -66,8 +55,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<String> registerCat(CategoryDTO cat) throws InvalidDataFromCategoryException {
-        validateData(cat);
+    public ResponseEntity<String> registerCat(CategoryDTO cat) {
+        //validateData(cat);
         saveCat(createCat(cat));
         // ¿Existiran casos de borde que puedan saltar el error de Save?
         return new ResponseEntity<>("Se creo la categoria.", HttpStatus.CREATED);
@@ -75,11 +64,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ResponseEntity<String> updateCat(Long id, CategoryDTO updCat)
-            throws InvalidDataFromCategoryException, CategoryNotFoundException {
+            throws CategoryNotFoundException {
         Category cat = getCatById(id).getBody();
 
         if (cat != null) {
-            validateData(updCat);
+            //validateData(updCat);
             cat.setName(updCat.getName());
             cat.setDescription(updCat.getDescription());
             saveCat(cat);
@@ -102,7 +91,7 @@ public class CategoryServiceImpl implements CategoryService {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public void validateData(CategoryDTO dto) throws InvalidDataFromCategoryException {
+    /*public void validateData(CategoryDTO dto) throws InvalidDataFromCategoryException {
         if (dto == null) {
             throw new InvalidDataFromCategoryException("La categoria no puede estar vacia.");
         }
@@ -112,7 +101,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (dto.getDescription() == null || dto.getDescription().isBlank() || dto.getDescription().length() < 10) {
             throw new InvalidDataFromCategoryException("La descripcion debe tener al menos 10 caracteres.");
         }
-    }
+    }*/
 
     public CategoryDTO toDTO(Category cat) {
         List<String> productNames = cat.getProducts().stream()

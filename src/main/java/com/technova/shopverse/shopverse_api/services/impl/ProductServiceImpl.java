@@ -3,7 +3,6 @@ package com.technova.shopverse.shopverse_api.services.impl;
 import com.technova.shopverse.shopverse_api.dtos.ProductDTO;
 import com.technova.shopverse.shopverse_api.dtos.ProductModifyDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
-import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromProductException;
 import com.technova.shopverse.shopverse_api.exceptions.ProductNotFoundException;
 import com.technova.shopverse.shopverse_api.model.Category;
 import com.technova.shopverse.shopverse_api.model.Product;
@@ -26,17 +25,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private CategoryRepository catRepo;
-
-    /*@Override
-    public ResponseEntity<List<Product>> listAllProds() {
-        // Optional.ofNullable() para evitar un NullPointerException.
-        return Optional.of(prodRepo.findAll())
-                .filter(products -> !products.isEmpty())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                // orElseGet() porque no se requiere un Throw y el metodo normal no sirve.
-                );
-    }*/
 
     @Override
     public ResponseEntity<List<ProductDTO>> listAllProdDTOs() {
@@ -85,8 +73,8 @@ public class ProductServiceImpl implements ProductService {
     public void saveProd(Product prod) { prodRepo.save(prod); }
 
     @Override
-    public ResponseEntity<String> registerProd(ProductModifyDTO prod) throws InvalidDataFromProductException, CategoryNotFoundException {
-        validateData(prod);
+    public ResponseEntity<String> registerProd(ProductModifyDTO prod) throws CategoryNotFoundException {
+        //validateData(prod);
         saveProd(createProd(prod));
         // ¿Existiran casos de borde que puedan saltar el error de Save?
         return new ResponseEntity<>("Se creo el producto.", HttpStatus.CREATED);
@@ -94,11 +82,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<String> updateProd(Long id, ProductModifyDTO updProd)
-            throws InvalidDataFromProductException, ProductNotFoundException, CategoryNotFoundException {
+            throws ProductNotFoundException, CategoryNotFoundException {
         Product prod = getProdById(id).getBody();
 
         if (prod != null) {
-            validateData(updProd);
+            //validateData(updProd);
             prod.setName(updProd.getName());
             prod.setDescription(updProd.getDescription());
             prod.setPrice(updProd.getPrice());
@@ -120,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    public void validateData(ProductModifyDTO dto) throws InvalidDataFromProductException {
+    /*public void validateData(ProductModifyDTO dto) throws InvalidDataFromProductException {
         if (dto == null) {
             throw new InvalidDataFromProductException("El producto no puede estar vacio.");
         }
@@ -136,7 +124,7 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getCategoryDTO().getId() == null || dto.getCategoryDTO().getId() <= 0) {
             throw new InvalidDataFromProductException("El ID de la categoria no puede venir vacio.");
         }
-    }
+    }*/
 
     public Category validateCategory(Long catId) throws CategoryNotFoundException {
         return catRepo.findById(catId).orElseThrow(

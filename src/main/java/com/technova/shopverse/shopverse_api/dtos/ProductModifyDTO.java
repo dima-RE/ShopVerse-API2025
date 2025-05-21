@@ -1,9 +1,21 @@
 package com.technova.shopverse.shopverse_api.dtos;
 
+import jakarta.validation.constraints.*;
+
 public class ProductModifyDTO {
+    @NotNull(message = "El nombre no puede ser nulo")
+    @NotBlank(message = "El nombre del producto no puede estar vacío")
     private String name;
+
+    @NotNull(message = "La descripción no debe ser nulo")
+    @NotBlank(message = "La descripción no puede estar vacía")
     private String description;
+
+    @NotNull(message = "El precio es obligatorio")
+    @Min(value = 1, message = "El precio debe ser mayor a 0")
     private Double price;
+
+    @NotNull(message = "La categoría es obligatoria")
     private CategoryDTO category;
 
     public ProductModifyDTO(String name, String description, Double price, CategoryDTO category) {
