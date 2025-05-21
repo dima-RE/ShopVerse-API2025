@@ -4,6 +4,7 @@ import com.technova.shopverse.shopverse_api.dtos.CategoryDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.exceptions.InvalidDataFromCategoryException;
 import com.technova.shopverse.shopverse_api.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +43,13 @@ public class CategoryController {
             throws InvalidDataFromCategoryException {
         return catServ.registerCat(category);
     }
+
+    // Use directamente un DTO, no funciona con los @Valid
+    /*@PostMapping
+    public ResponseEntity<String> createCategory(@Valid @RequestBody Category category)
+            throws InvalidDataFromCategoryException {
+        return catServ.registerCat(category);
+    }*/
 
     // se puede usar el <?> para indicar que el tipo puede variar
     @PutMapping("/{id}")
