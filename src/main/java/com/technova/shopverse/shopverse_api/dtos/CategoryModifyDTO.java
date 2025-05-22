@@ -1,10 +1,6 @@
 package com.technova.shopverse.shopverse_api.dtos;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
-import java.util.List;
+import jakarta.validation.constraints.*;
 
 public class CategoryModifyDTO {
     @NotNull(message = "El nombre no puede ser nulo")

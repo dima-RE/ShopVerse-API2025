@@ -4,7 +4,6 @@ import com.technova.shopverse.shopverse_api.dtos.CategoryDTO;
 import com.technova.shopverse.shopverse_api.dtos.CategoryModifyDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.model.Category;
-import com.technova.shopverse.shopverse_api.model.Product;
 import com.technova.shopverse.shopverse_api.repositories.CategoryRepository;
 import com.technova.shopverse.shopverse_api.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
