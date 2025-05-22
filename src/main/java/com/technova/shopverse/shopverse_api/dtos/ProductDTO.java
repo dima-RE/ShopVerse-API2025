@@ -9,6 +9,7 @@ package com.technova.shopverse.shopverse_api.dtos;
     //}
 }*/
 
+import com.technova.shopverse.shopverse_api.model.Product;
 import jakarta.validation.constraints.*;
 
 public class ProductDTO {
@@ -30,12 +31,13 @@ public class ProductDTO {
     @NotBlank(message = "La categoría no puede estar vacía")
     private String categoryName;
 
-    public ProductDTO(Long id, String name, String description, Double price, String categoryName) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.categoryName = categoryName;
+    public ProductDTO(Product prod) {
+        this.id = prod.getId();
+        this.name = prod.getName();
+        this.description = prod.getDescription();
+        this.price = prod.getPrice();
+        this.categoryName = prod.getCategory() != null
+                ? prod.getCategory().getName() : null;
     }
 
     public Long getId() {

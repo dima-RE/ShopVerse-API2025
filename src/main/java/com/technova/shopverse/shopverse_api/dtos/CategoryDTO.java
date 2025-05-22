@@ -1,5 +1,7 @@
 package com.technova.shopverse.shopverse_api.dtos;
 
+import com.technova.shopverse.shopverse_api.model.Category;
+import com.technova.shopverse.shopverse_api.model.Product;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
@@ -18,11 +20,12 @@ public class CategoryDTO {
 
     private List<String> productsNames;
 
-    public CategoryDTO(Long id, String name, String description, List<String> productsNames) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.productsNames = productsNames;
+    public CategoryDTO(Category cat) {
+        this.id = cat.getId();
+        this.name = cat.getName();
+        this.description = cat.getDescription();
+        this.productsNames = cat.getProducts().stream() // Stream/Flujo de tipo ARRAY en JS
+                .map(Product::getName).toList();
     }
 
     public Long getId() {

@@ -1,6 +1,7 @@
 package com.technova.shopverse.shopverse_api.services.impl;
 
 import com.technova.shopverse.shopverse_api.dtos.CategoryDTO;
+import com.technova.shopverse.shopverse_api.dtos.CategoryModifyDTO;
 import com.technova.shopverse.shopverse_api.exceptions.CategoryNotFoundException;
 import com.technova.shopverse.shopverse_api.model.Category;
 import com.technova.shopverse.shopverse_api.model.Product;
@@ -23,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<List<CategoryDTO>> listAllCatDTOs() {
         return Optional.of(
-                    catRepo.findAll().stream().map(this::toDTO).toList()
+                    catRepo.findAll().stream().map(CategoryDTO::new).toList()
                 )
                 .filter(categories -> !categories.isEmpty())
                 .map(ResponseEntity::ok)
@@ -40,12 +41,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ResponseEntity<CategoryDTO> getCatDTOById(Long id) throws CategoryNotFoundException {
-       return catRepo.findById(id).map(this::toDTO).map(ResponseEntity::ok).orElseThrow(
+       return catRepo.findById(id).map(CategoryDTO::new).map(ResponseEntity::ok).orElseThrow(
                 () -> new CategoryNotFoundException("Categoria no encontrada con el id: " + id));
     }
 
     //@Override
-    public Category createCat(CategoryDTO dto) {
+    public Category createCat(CategoryModifyDTO dto) {
         return new Category(dto.getName(), dto.getDescription());
     }
 
@@ -55,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<String> registerCat(CategoryDTO cat) {
+    public ResponseEntity<String> registerCat(CategoryModifyDTO cat) {
         //validateData(cat);
         saveCat(createCat(cat));
         // ¿Existiran casos de borde que puedan saltar el error de Save?
@@ -63,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public ResponseEntity<String> updateCat(Long id, CategoryDTO updCat)
+    public ResponseEntity<String> updateCat(Long id, CategoryModifyDTO updCat)
             throws CategoryNotFoundException {
         Category cat = getCatById(id).getBody();
 
@@ -103,11 +104,11 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }*/
 
-    public CategoryDTO toDTO(Category cat) {
-        List<String> productNames = cat.getProducts().stream()
+    /*public CategoryDTO toDTO(Category cat) {
+        List<String> productNames = cat.getProducts().stream() // Stream/Flujo de tipo ARRAY en JS
                 .map(Product::getName).toList();
         return new CategoryDTO(cat.getId(), cat.getName(),
                 cat.getDescription(), productNames);
-    }
+    }*/
 
 }

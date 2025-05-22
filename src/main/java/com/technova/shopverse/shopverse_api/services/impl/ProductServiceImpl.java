@@ -30,7 +30,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<List<ProductDTO>> listAllProdDTOs() {
         // Optional.ofNullable() para evitar un NullPointerException.
         return Optional.of(
-                        prodRepo.findAll().stream().map(this::toDTO).toList()
+                        prodRepo.findAll().stream().map(ProductDTO::new).toList()
                 )
                 .filter(products -> !products.isEmpty())
                 .map(ResponseEntity::ok)
@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<List<ProductDTO>> getByCategoryId(Long categoryId) {
         return Optional.of(
-                        prodRepo.findByCategoryId(categoryId).stream().map(this::toDTO).toList()
+                        prodRepo.findByCategoryId(categoryId).stream().map(ProductDTO::new).toList()
                 )
                 .filter(products -> !products.isEmpty())
                 .map(ResponseEntity::ok)
@@ -59,14 +59,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<ProductDTO> getProdDTOById(Long id) throws ProductNotFoundException {
-        return prodRepo.findById(id).map(this::toDTO).map(ResponseEntity::ok).orElseThrow(
+        return prodRepo.findById(id).map(ProductDTO::new).map(ResponseEntity::ok).orElseThrow(
                 () -> new ProductNotFoundException("Producto no encontrado con el ID: " + id));
     }
 
     //@Override
     public Product createProd(ProductModifyDTO dto) throws CategoryNotFoundException {
         return new Product(dto.getName(), dto.getDescription(), dto.getPrice(),
-                validateCategory(dto.getCategoryDTO().getId()));
+                validateCategory(dto.getCategoryId()));
     }
 
     //@Override
@@ -90,7 +90,7 @@ public class ProductServiceImpl implements ProductService {
             prod.setName(updProd.getName());
             prod.setDescription(updProd.getDescription());
             prod.setPrice(updProd.getPrice());
-            prod.setCategory(validateCategory(updProd.getCategoryDTO().getId()));
+            prod.setCategory(validateCategory(updProd.getCategoryId()));
             saveProd(prod);
             return new ResponseEntity<>("Se actualizo el producto.", HttpStatus.OK);
         }
@@ -131,12 +131,12 @@ public class ProductServiceImpl implements ProductService {
                 () -> new CategoryNotFoundException("Categoria no encontrada con el id " + catId));
     }
 
-    public ProductDTO toDTO(Product prod) {
+    /*public ProductDTO toDTO(Product prod) {
         String catName = prod.getCategory() != null
                 ? prod.getCategory().getName() : null;
         return new ProductDTO(prod.getId(),
                 prod.getName(), prod.getDescription(),
                 prod.getPrice(), catName);
-    }
+    }*/
 
 }

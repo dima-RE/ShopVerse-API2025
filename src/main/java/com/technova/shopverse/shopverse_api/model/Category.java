@@ -24,6 +24,7 @@ public class Category {
     @OneToMany(mappedBy = "category")
     @JsonManagedReference
     private List<Product> products;
+    // Se sugiere cambiar los List por Set,
 
     public Category() {}
 

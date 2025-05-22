@@ -15,14 +15,14 @@ public class ProductModifyDTO {
     @Min(value = 1, message = "El precio debe ser mayor a 0")
     private Double price;
 
-    @NotNull(message = "La categoría es obligatoria")
-    private CategoryDTO category;
+    @NotNull(message = "El ID de categoría es obligatoria")
+    private Long categoryId;
 
-    public ProductModifyDTO(String name, String description, Double price, CategoryDTO category) {
+    public ProductModifyDTO(String name, String description, Double price, Long categoryId) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.category = category;
+        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -49,12 +49,11 @@ public class ProductModifyDTO {
         this.price = price;
     }
 
-    public CategoryDTO getCategoryDTO() {
-        return category;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryDTO(CategoryDTO category) {
-        this.category = category;
-
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 }

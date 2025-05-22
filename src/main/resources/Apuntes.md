@@ -620,3 +620,88 @@ Spring Boot integra Bean Validation (JSR 380), lo que permite aplicar anotacione
 * @Min(1) = Que el número sea igual o mayor al mínimo
 * @Size(min=5) = Que la cadena tenga al menos una cierta longitud
 * @Email  = Que el string sea un email válido
+
+# Transactional
+ACID / Atomic C I D = Atomicidad
+
+@Transactional en un Controller para volver las acciones hacia atras.
+
+# Security
+
+## Usuario a usar
+
+Vamos a configurar dos usuarios directamente en la memoria de la aplicación:
+
+Usuario
+Contraseña
+Rol
+
+admin
+admin123
+ADMIN
+
+user
+user123
+USER
+
+
+## Acceso por rol
+
+Ejemplo de acceso por rol:
+
+Método HTTP
+Ruta
+Rol requerido
+
+GET
+/api/products
+USER o ADMIN
+
+POST
+/api/products
+ADMIN
+
+PUT
+/api/products/{id}
+ADMIN
+
+DELETE
+/api/products/{id}
+ADMIN
+
+GET
+/api/categories
+USER o ADMIN
+
+POST, PUT...
+/api/categories/**
+ADMIN
+
+## ¿Cómo lo vamos a probar?
+Podrás probar la seguridad de la API con herramientas como:
+
+Postman
+Ir a la pestaña "Authorization"
+
+
+Seleccionar "Basic Auth"
+
+
+Ingresar usuario y contraseña
+
+
+Enviar la petición
+
+## Notas importantes:
+@EnableMethodSecurity permite usar anotaciones como @PreAuthorize en controladores (opcional).
+
+
+{noop} indica que no se aplicará cifrado a las contraseñas (solo para pruebas).
+
+
+El acceso a /h2-console/** está permitido sin autenticación.
+
+
+Los demás endpoints requieren autenticación básica.
+
+

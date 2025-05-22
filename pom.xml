@@ -43,10 +43,10 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 		<!-- Usar en Modulo 9 -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency> -->
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
