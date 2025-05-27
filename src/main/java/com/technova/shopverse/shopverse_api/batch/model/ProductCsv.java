@@ -1,7 +1,5 @@
 package com.technova.shopverse.shopverse_api.batch.model;
 
-import jakarta.validation.constraints.*;
-
 public class ProductCsv {
     //@NotNull(message = "El nombre no puede ser nulo")
     //@NotBlank(message = "El nombre del producto no puede estar vacío")
