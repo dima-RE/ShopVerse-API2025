@@ -695,13 +695,9 @@ Enviar la petición
 ## Notas importantes:
 @EnableMethodSecurity permite usar anotaciones como @PreAuthorize en controladores (opcional).
 
-
 {noop} indica que no se aplicará cifrado a las contraseñas (solo para pruebas).
-
 
 El acceso a /h2-console/** está permitido sin autenticación.
 
-
 Los demás endpoints requieren autenticación básica.
-
 
