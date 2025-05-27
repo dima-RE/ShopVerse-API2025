@@ -20,15 +20,23 @@ import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Configuration
 @EnableBatchProcessing
 public class BatchConfig {
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
     private final CategoryRepository catRepo;
     private final ProductRepository prodRepo;
 
-    public BatchConfig(CategoryRepository catRepo, ProductRepository prodRepo) {
+    public BatchConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager, CategoryRepository catRepo, ProductRepository prodRepo) {
+        this.jobRepository = jobRepository;
+        this.transactionManager = transactionManager;
         this.catRepo = catRepo;
         this.prodRepo = prodRepo;
     }
@@ -49,10 +57,35 @@ public class BatchConfig {
                 .build();
     }
 
+    @Bean
     public FlatFileItemReader<ProductCsv> productReader() {
         return new FlatFileItemReaderBuilder<ProductCsv>()
                 .name("productReader")
                 .resource(new ClassPathResource("data/products.csv"))
+                .linesToSkip(1)
+                .delimited()
+                .names("name", "description", "price", "categoryId")
+                .targetType(ProductCsv.class)
+                .build();
+    }
+    // Uso en Controller
+    public FlatFileItemReader<CategoryCsv> categoryExternalReader(MultipartFile file)
+            throws IOException {
+        return new FlatFileItemReaderBuilder<CategoryCsv>()
+                .name("categoryReader")
+                .resource(new InputStreamResource(file.getInputStream()))
+                .linesToSkip(1) // ← ignora encabezado del CSV
+                .delimited()
+                .names("name", "description")
+                .targetType(CategoryCsv.class)
+                .build();
+    }
+    // Uso en Controller
+    public FlatFileItemReader<ProductCsv> productExternalReader(MultipartFile file)
+            throws IOException {
+        return new FlatFileItemReaderBuilder<ProductCsv>()
+                .name("productReader")
+                .resource(new InputStreamResource(file.getInputStream()))
                 .linesToSkip(1)
                 .delimited()
                 .names("name", "description", "price", "categoryId")
@@ -109,6 +142,32 @@ public class BatchConfig {
                 .writer(productWriter())
                 .build();
     }
+    // Uso en Controller
+    public Step importCategoriesExternalStep(MultipartFile file
+            /*, ItemProcessor<CategoryCsv, Category> processor, ItemWriter<Category> writer*/)
+            throws IOException {
+        return new StepBuilder("importCategoriesExtStep", jobRepository)
+                .<CategoryCsv, Category>chunk(10, transactionManager)
+                .reader(categoryExternalReader(file))
+                //.processor(processor)
+                //.writer(writer)
+                .processor(categoryProcessor())
+                .writer(categoryWriter())
+                .build();
+    }
+    // Uso en Controller
+    public Step importProductsExternalStep(MultipartFile file
+            /*, ItemProcessor<ProductCsv, Product> processor, ItemWriter<Product> writer*/)
+            throws IOException {
+        return new StepBuilder("importProductsStep", jobRepository)
+                .<ProductCsv, Product>chunk(10, transactionManager)
+                .reader(productExternalReader(file))
+                //.processor(processor)
+                //.writer(writer)
+                .processor(productProcessor())
+                .writer(productWriter())
+                .build();
+    }
 
     // ========== JOB BUILDING ==========
     // Ejecucion de STEPs con .start y .next
@@ -117,6 +176,18 @@ public class BatchConfig {
         return new JobBuilder("importCatalogJob", jobRepository)
                 .start(importCategoriesStep)
                 .next(importProductsStep)
+                .build();
+    }
+    // Uso en Controller
+    public Job importCategoriesExternalJob(Step step) {
+        return new JobBuilder("importCategoriesExternalJob", jobRepository)
+                .start(step)
+                .build();
+    }
+    // Uso en Controller
+    public Job importProductsExternalJob(Step step) {
+        return new JobBuilder("importProductsExternalJob", jobRepository)
+                .start(step)
                 .build();
     }
 
