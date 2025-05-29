@@ -22,6 +22,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        //.requestMatchers("/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll() // acceso libre a H2
                         .requestMatchers("/api/products/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/categories/**").hasAnyRole("USER", "ADMIN")
